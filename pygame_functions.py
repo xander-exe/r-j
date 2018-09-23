@@ -260,10 +260,15 @@ class newLabel(pygame.sprite.Sprite):
         for line in textLines:
             lineSurfaces.append(self.font.render(line, True, self.fontColour))
             thisRect = lineSurfaces[-1].get_rect()
-            if thisRect.width > maxWidth:
-                maxWidth = thisRect.width
-            if thisRect.height > maxHeight:
-                maxHeight = thisRect.height
+            #print(self.text.lower())
+            if " start" == self.text.lower() or " options" == self.text.lower() or " quit" == self.text.lower():
+                maxWidth = 190
+                maxHeight = 50
+            else:
+                if thisRect.width > maxWidth:
+                    maxWidth = thisRect.width
+                if thisRect.height > maxHeight:
+                    maxHeight = thisRect.height
         self.image = pygame.Surface((maxWidth, (self.fontSize + 1) * len(textLines) + 5), pygame.SRCALPHA, 32)
         self.image.convert_alpha()
         if self.background != "clear":
@@ -273,6 +278,7 @@ class newLabel(pygame.sprite.Sprite):
             self.image.blit(lineSurface, [0, linePos])
             linePos += self.fontSize + 1
         self.rect = self.image.get_rect()
+        #return maxWidth, maxHeight
 
 
 def loadImage(fileName, useColorKey=False):

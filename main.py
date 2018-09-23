@@ -2,81 +2,78 @@ from pygame_functions import *
 import pygame
 import os
 
-print(pygame.font.get_fonts())
-
 base_folder = os.path.dirname(__file__)
 
 #Title Screen
 screenSize(1000, 700)
-setBackgroundImage(base_folder+"/resources/assets/backgrounds/space.png")
+setBackgroundImage(base_folder+"/resources/assets/backgrounds/landscape.png")
 pygame.display.set_caption("Romeo and Juliet")
 
 titleMusic = makeMusic(base_folder+"/resources/assets/sound/music/title.wav")
 playMusic(-1)
 
-titleLabel = makeLabel("Romeo and Juliet", 80, 285, 100, "white", "gabriola")
+def intro():
+    is_intro = True
+    is_options = False
+    selectCharacter = False
 
-drawRect(350, 250, 300, 80, "gray")
-drawRect(350, 250, 300, 80, "black", 5)
+    titleLabel = makeLabel("Romeo and Juliet", 80, 100, 100, "white", "gabriola", "clear")
+    titleLabel_two = makeLabel("The Game", 60, 100, 180, "white", "gabriola", "clear")
+    startLabel = makeLabel(" Start", 50, 100, 280, "black", "gabriola", "white")
+    optionsLabel = makeLabel(" Options", 50, 100, 360, "black", "gabriola", "white")
+    quitLabel = makeLabel(" Quit", 50, 100, 440, "black", "gabriola", "white")
 
-drawRect(350, 400, 300, 80, "gray")
-drawRect(350, 400, 300, 80, "black", 5)
+    while is_intro:
+        showLabel(titleLabel), showLabel(titleLabel_two) ,showLabel(startLabel), showLabel(optionsLabel), showLabel(quitLabel)
 
-drawRect(350, 550, 300, 80, "gray")
-drawRect(350, 550, 300, 80, "black", 5)
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
 
-start = False
-intro = True
+        #Button 1 (Start)
+        if 100+190 > mouse[0] > 100 and 280+50 > mouse[1] > 280:
+            startLabel.update(" Start", "black", "orange")
+            if click[0] == 1:
+                print("Click Received! \n")
+                is_intro = False
+                selectCharacter = True
+        else:
+            startLabel.update(" Start", "black", "white")
 
-while intro:
-    showLabel(titleLabel)
+        #Button 2 (Options)
+        if 100+190 > mouse[0] > 100 and 360+50 > mouse[1] > 360:
+            optionsLabel.update(" Options", "black", "orange")
+            if click[0] == 1:
+                print("Click Received! \n")
+                is_intro = False
+                is_options = True
+        else:
+            optionsLabel.update(" Options", "black", "white")
 
-    mouse = pygame.mouse.get_pos()
-    click = pygame.mouse.get_pressed()
+        #Button 3 (Quit)
+        if 100+190 > mouse[0] > 100 and 440+50 > mouse[1] > 440:
+            quitLabel.update(" Quit", "black", "orange")
+            if click[0] == 1:
+                print("Click Received! \n")
+                is_intro = False
+                quit()
+        else:
+            quitLabel.update(" Quit", "black", "white")
 
-    #Button 1 (Start)
-    if 350+300 > mouse[0] > 350 and 250+80 > mouse[1] > 250:
-        drawRect(350, 250, 300, 80, "cyan")
-        drawRect(350, 250, 300, 80, "black", 5)
-        if click[0] == 1:
-            print("Click 1 Received! \n")
-            start = True
-            intro = False
-    else:
-        drawRect(350, 250, 300, 80, "gray")
-        drawRect(350, 250, 300, 80, "black", 5)
+        tick(30)
 
-    #Button 2 (Options)
-    if 350+300 > mouse[0] > 350 and 400+80 > mouse[1] > 400:
-        drawRect(350, 400, 300, 80, "cyan")
-        drawRect(350, 400, 300, 80, "black", 5)
-        if click[0] == 1:
-            print("Click 2 Received! \n")
-            start = True
-            intro = False
-    else:
-        drawRect(350, 400, 300, 80, "gray")
-        drawRect(350, 400, 300, 80, "black", 5)
-
-    #Button 3 (Quit)
-    if 350+300 > mouse[0] > 350 and 550+80 > mouse[1] > 550:
-        drawRect(350, 550, 300, 80, "cyan")
-        drawRect(350, 550, 300, 80, "black", 5)
-        if click[0] == 1:
-            print("Click 3 Received! \n")
-            quit()
-    else:
-        drawRect(350, 550, 300, 80, "gray")
-        drawRect(350, 550, 300, 80, "black", 5)
+    while is_options:
+        hideLabel(startLabel), hideLabel(optionsLabel), hideLabel(quitLabel)
+        titleLabel_two.update("The Game - Options", "white", 0)
 
 
-    if start:
-        setBackgroundImage(base_folder+"/resources/assets/backgrounds/stars.png")
+        tick(30)
 
-    else:
-        pass
+    while selectCharacter:
+        hideLabel(startLabel), hideLabel(optionsLabel), hideLabel(quitLabel)
 
-    tick(30)
 
-hideLabel(titleLabel)
+        tick(30)
+
+intro()
+
 endWait()
