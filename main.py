@@ -2,15 +2,26 @@ from pygame_functions import *
 import pygame
 import os
 
-base_folder = os.path.dirname(__file__)
+base_folder = os.path.dirname(os.path.abspath(__file__))
 
 #Title Screen
 screenSize(1000, 700)
-setBackgroundImage(base_folder+"/resources/assets/backgrounds/landscape.png")
+background = (base_folder+ "/resources/assets/backgrounds/landscape.png")
+setBackgroundImage(background)
 pygame.display.set_caption("Romeo and Juliet")
 
 titleMusic = makeMusic(base_folder+"/resources/assets/sound/music/title.wav")
 playMusic(-1)
+
+def button_clicked(the_label, text, xpos, width, ypos, height, mouse, click):
+    if xpos + width > mouse[0] > xpos and ypos + height > mouse[1] > ypos:
+        the_label.update(text, "black", "orange")
+        if click[0] == 1:
+            print("Click Received! \n")
+            return True
+    else:
+        the_label.update(text, "black", "white")
+
 
 def intro():
     is_intro = True
@@ -30,34 +41,22 @@ def intro():
         click = pygame.mouse.get_pressed()
 
         #Button 1 (Start)
-        if 100+190 > mouse[0] > 100 and 280+50 > mouse[1] > 280:
-            startLabel.update(" Start", "black", "orange")
-            if click[0] == 1:
-                print("Click Received! \n")
-                is_intro = False
-                selectCharacter = True
-        else:
-            startLabel.update(" Start", "black", "white")
+        b1 = button_clicked(startLabel, " Start", 100, 190, 280, 50, mouse, click)
+        if b1 == True:
+            is_intro = False
+            selectCharacter = True
 
         #Button 2 (Options)
-        if 100+190 > mouse[0] > 100 and 360+50 > mouse[1] > 360:
-            optionsLabel.update(" Options", "black", "orange")
-            if click[0] == 1:
-                print("Click Received! \n")
-                is_intro = False
-                is_options = True
-        else:
-            optionsLabel.update(" Options", "black", "white")
+        b2 = button_clicked(optionsLabel, " Options", 100, 190, 360, 50, mouse, click)
+        if b2 == True:
+            is_intro = False
+            is_options = True
 
         #Button 3 (Quit)
-        if 100+190 > mouse[0] > 100 and 440+50 > mouse[1] > 440:
-            quitLabel.update(" Quit", "black", "orange")
-            if click[0] == 1:
-                print("Click Received! \n")
-                is_intro = False
-                quit()
-        else:
-            quitLabel.update(" Quit", "black", "white")
+        b3 = button_clicked(quitLabel, " Quit", 100, 190, 440, 50, mouse, click)
+        if b3 == True:
+            is_intro = False
+            quit()
 
         tick(30)
 
