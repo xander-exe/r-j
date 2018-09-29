@@ -261,7 +261,8 @@ class newLabel(pygame.sprite.Sprite):
             lineSurfaces.append(self.font.render(line, True, self.fontColour))
             thisRect = lineSurfaces[-1].get_rect()
             #print(self.text.lower())
-            if " start" == self.text.lower() or " options" == self.text.lower() or " quit" == self.text.lower():
+            myButtons = [" start", " options", " quit", " back"]
+            if self.text.lower() in myButtons:
                 maxWidth = 190
                 maxHeight = 50
             else:
@@ -278,7 +279,7 @@ class newLabel(pygame.sprite.Sprite):
             self.image.blit(lineSurface, [0, linePos])
             linePos += self.fontSize + 1
         self.rect = self.image.get_rect()
-        #return maxWidth, maxHeight
+        return maxWidth, maxHeight
 
 
 def loadImage(fileName, useColorKey=False):
