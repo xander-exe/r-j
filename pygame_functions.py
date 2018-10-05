@@ -261,10 +261,14 @@ class newLabel(pygame.sprite.Sprite):
             lineSurfaces.append(self.font.render(line, True, self.fontColour))
             thisRect = lineSurfaces[-1].get_rect()
             #print(self.text.lower())
-            myButtons = [" start", " options", " quit", " back"]
+            myButtons = [" start", " options", " quit", " back"]#, " montagues", " capulets"]
+            mySelections = [" montagues", " capulets"]
             if self.text.lower() in myButtons:
                 maxWidth = 190
                 maxHeight = 50
+            elif self.text.lower() in mySelections:
+                maxWidth = 220
+                maxHeight = 70
             else:
                 if thisRect.width > maxWidth:
                     maxWidth = thisRect.width
@@ -742,5 +746,4 @@ def setAutoUpdate(val):
 
 
 if __name__ == "__main__":
-    print(""""pygame_functions is not designed to be run directly.
-    See the wiki at https://github.com/StevePaget/Pygame_Functions/wiki/Getting-Started for more information""")
+    print()

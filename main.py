@@ -1,11 +1,12 @@
 from pygame_functions import *
 import pygame
 import os
+import time
 
 base_folder = os.path.dirname(os.path.abspath(__file__))
 
 #Title Screen
-screenSize(1000, 700)
+screen = screenSize(1000, 700)
 bg_image = (base_folder+ "/resources/assets/backgrounds/landscape.png")
 setBackgroundImage(bg_image)
 pygame.display.set_caption("Romeo and Juliet")
@@ -16,17 +17,28 @@ pygame.mixer.music.set_volume(0.5)
 
 slider_hit = False
 
-def button_clicked(the_label, text, xpos, width, ypos, height, mouse, click, is_slider = False):
+class level():
+    num = 0
+    def generic_function():
+        return num
+
+def button_clicked(the_label, text, width, height, mouse, click, is_slider = False):
     if not is_slider:
-        if xpos + width > mouse[0] > xpos and ypos + height > mouse[1] > ypos:
+        if the_label.rect.topleft[0] + width > mouse[0] > the_label.rect.topleft[0] and the_label.rect.topleft[1] + height > mouse[1] > the_label.rect.topleft[1]:
             the_label.update(text, "black", "orange")
+            if the_label.rect.topleft[0] == 100:
+                moveLabel(the_label, (the_label.rect.topleft[0] + 20), the_label.rect.topleft[1])
+
             if click[0] == 1:
                 print("Click Received! \n")
                 return True
         else:
             the_label.update(text, "black", "white")
+            if the_label.rect.topleft[0] == 120:
+                moveLabel(the_label, (the_label.rect.topleft[0] - 20), the_label.rect.topleft[1])
+
     else:
-        if the_label.rect.topleft[0] + width > mouse[0] > the_label.rect.topleft[0] and ypos + height > mouse[1] > ypos:
+        if the_label.rect.topleft[0] + width > mouse[0] > the_label.rect.topleft[0] and the_label.rect.topleft[1] + height > mouse[1] > the_label.rect.topleft[1]:
             if click[0] == 1:
                 global slider_hit
                 slider_hit = True
@@ -39,6 +51,8 @@ def intro():
     is_intro = True
     is_options = False
     selectCharacter = False
+    is_fade = False
+    chosenRole = ""
 
     titleLabel = makeLabel("Romeo and Juliet", 80, 100, 100, "white", "gabriola", "clear")
     titleLabel_two = makeLabel("The Game", 60, 100, 180, "white", "gabriola", "clear")
@@ -50,6 +64,9 @@ def intro():
     soundSlider = makeLabel("    ", 50, 300, 280, "black", "gabriola", "white")
     soundLabel = makeLabel(" ", 60, 550, 280, "white", "gabriola", "clear")
 
+    selectMontague = makeLabel(" Montagues", 60, 240, 320, "black", "gabriola", "white")
+    selectCapulet = makeLabel(" Capulets", 60, 540, 320, "black", "gabriola", "white")
+
     while is_intro:
         showLabel(titleLabel), showLabel(titleLabel_two) ,showLabel(startLabel), showLabel(optionsLabel), showLabel(quitLabel)
 
@@ -57,19 +74,19 @@ def intro():
         click = pygame.mouse.get_pressed()
 
         #Button 1 (Start)
-        b1 = button_clicked(startLabel, " Start", 100, 190, 280, 50, mouse, click)
+        b1 = button_clicked(startLabel, " Start", 190, 50, mouse, click)
         if b1 == True:
             is_intro = False
             selectCharacter = True
 
         #Button 2 (Options)
-        b2 = button_clicked(optionsLabel, " Options", 100, 190, 360, 50, mouse, click)
+        b2 = button_clicked(optionsLabel, " Options", 190, 50, mouse, click)
         if b2 == True:
             is_intro = False
             is_options = True
 
         #Button 3 (Quit)
-        b3 = button_clicked(quitLabel, " Quit", 100, 190, 440, 50, mouse, click)
+        b3 = button_clicked(quitLabel, " Quit", 190, 50, mouse, click)
         if b3 == True:
             is_intro = False
             quit()
@@ -85,7 +102,7 @@ def intro():
 
             showLabel(soundSlider), showLabel(soundLabel), showLabel(backLabel)
 
-            b4 = button_clicked(backLabel, " Back", 100, 190, 500, 50, mouse, click)
+            b4 = button_clicked(backLabel, " Back", 190, 50, mouse, click)
             if b4 == True:
                 is_intro = True
                 is_options = False
@@ -93,7 +110,7 @@ def intro():
                 titleLabel_two.update("The Game", "white", 0)
                 break
 
-            button_clicked(soundSlider, "    ", 0, 36, 280, 51, mouse, click, True)
+            button_clicked(soundSlider, "    ", 36, 51, mouse, click, True)
 
             minimum = 100
             maximum = 500
@@ -114,9 +131,53 @@ def intro():
 
     while selectCharacter:
         hideLabel(startLabel), hideLabel(optionsLabel), hideLabel(quitLabel)
+        titleLabel_two.update("The Game - Role Selection", "white", 0)
+        showLabel(selectMontague), showLabel(selectCapulet)
+
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        b5 = button_clicked(selectMontague, " Montagues", 220, 70, mouse, click)
+        if b5 == True:
+            is_intro = False
+            selectCharacter = False
+            chosenRole = "Montagues"
+            break
+
+        b6 = button_clicked(selectCapulet, " Capulets", 220, 70, mouse, click)
+        if b6 == True:
+            is_intro = False
+            selectCharacter = False
+            chosenRole = "Capulets"
+            break
 
         tick(30)
 
-intro()
+    hideLabel(selectMontague), hideLabel(selectCapulet), hideLabel(titleLabel), hideLabel(titleLabel_two)
+    return chosenRole
 
-endWait()
+chosen_role = intro()
+
+#Fade out
+fade = pygame.Surface((1000,700))
+for alpha in range(0, 50):
+    fade.set_alpha(alpha)
+    fade.fill((0, 0, 0))
+    screen.blit(fade, (0,0))
+    pygame.display.update()
+    pygame.time.delay(1)
+stopMusic()
+
+#Fancy loading screen here?
+
+
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+
+    pygame.display.update()
+    #Perhaps consider updateDisplay() if bugs arise
+#endWait()
