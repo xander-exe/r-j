@@ -5,6 +5,18 @@ import time
 
 base_folder = os.path.dirname(os.path.abspath(__file__))
 
+def get_vol_pref():
+    with open(base_folder+ "/resources/preferences/volume.txt", "r") as vol_pref:
+        data = vol_pref.read()
+        vol_pref.close()
+
+        return data
+
+def update_vol_pref(vol):
+    with open(base_folder+ "/resources/preferences/volume.txt", "w") as vol_pref:
+        vol_pref.write(str(vol))
+        vol_pref.close()
+
 #Title Screen
 screen = screenSize(1000, 700)
 bg_image = (base_folder+ "/resources/assets/backgrounds/landscape.png")
@@ -13,7 +25,8 @@ pygame.display.set_caption("Romeo and Juliet")
 
 titleMusic = makeMusic(base_folder+"/resources/assets/sound/music/title.wav")
 playMusic(-1)
-pygame.mixer.music.set_volume(0.5)
+
+pygame.mixer.music.set_volume(float(get_vol_pref()))
 
 slider_hit = False
 
@@ -61,7 +74,7 @@ def intro():
     quitLabel = makeLabel(" Quit", 50, 100, 440, "black", "gabriola", "white")
     backLabel = makeLabel(" Back", 50, 100, 520, "black", "gabriola", "white")
 
-    soundSlider = makeLabel("    ", 50, 300, 280, "black", "gabriola", "white")
+    soundSlider = makeLabel("    ", 50, ((float(get_vol_pref()) * 400) + 100), 280, "black", "gabriola", "white")
     soundLabel = makeLabel(" ", 60, 550, 280, "white", "gabriola", "clear")
 
     selectMontague = makeLabel(" Montagues", 60, 240, 320, "black", "gabriola", "white")
@@ -127,6 +140,8 @@ def intro():
             pygame.mixer.music.set_volume(volume_value)
             soundLabel.update((str(int(volume_value * 100)) + "% - Volume"), "white", 0)
 
+            update_vol_pref(volume_value)
+
             tick(30)
 
     while selectCharacter:
@@ -160,17 +175,48 @@ chosen_role = intro()
 
 #Fade out
 fade = pygame.Surface((1000,700))
-for alpha in range(0, 50):
-    fade.set_alpha(alpha)
-    fade.fill((0, 0, 0))
-    screen.blit(fade, (0,0))
-    pygame.display.update()
-    pygame.time.delay(1)
+def fade_out():
+    for alpha in range(0, 50):
+        fade.set_alpha(alpha)
+        fade.fill((0, 0, 0))
+        screen.blit(fade, (0,0))
+        pygame.display.update()
+        pygame.time.delay(1)
+
+fade_out()
 stopMusic()
 
 #Fancy loading screen here?
 
+def prologue():
+    setBackgroundImage(bg_image)
+    the_lines = makeSprite(base_folder+ "/resources/assets/images/prologue_lines.png")
 
+    continueLabel_1 = makeLabel(" Continue", 60, 390, 550, "black", "gabriola", "white")
+    ypos = 700
+
+    show_prologue = True
+
+    while show_prologue:
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        showSprite(the_lines)
+        if ypos >= -750:
+            moveSprite(the_lines, 73, ypos)
+            ypos -= 1.5
+
+        else:
+            pygame.time.delay(1)
+            showLabel(continueLabel_1)
+            b7 = button_clicked(continueLabel_1, " Continue", 220, 70, mouse, click)
+            if b7 == True:
+                print("Yay")
+                #Do button stuff
+
+        tick(30)
+
+prologue()
 
 while True:
     for event in pygame.event.get():
