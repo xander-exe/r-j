@@ -648,10 +648,14 @@ def clock():
 
 def tick(fps):
     pygame.event.clear()
-    keys = pygame.key.get_pressed()
-    if (keys[pygame.K_ESCAPE]):
-        pygame.quit()
-        sys.exit()
+    #keys = pygame.key.get_pressed()
+    #if (keys[pygame.K_BACKSPACE]):
+    #    pygame.quit()
+    #    sys.exit()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
     gameClock.tick(fps)
     return gameClock.get_fps()
 
@@ -686,9 +690,13 @@ def updateDisplay():
     textboxRects = textboxGroup.draw(screen)
     pygame.display.update()
     keys = pygame.key.get_pressed()
-    if (keys[pygame.K_ESCAPE]):
-        pygame.quit()
-        sys.exit()
+    #if (keys[pygame.K_ESCAPE]):
+    #    pygame.quit()
+    #    sys.exit()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
     spriteGroup.clear(screen, background.surface)
     textboxGroup.clear(screen, background.surface)
 

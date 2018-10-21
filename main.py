@@ -19,8 +19,10 @@ def update_vol_pref(vol):
 
 #Title Screen
 screen = screenSize(1000, 700)
-bg_image = (base_folder+ "/resources/assets/backgrounds/landscape.png")
-setBackgroundImage(bg_image)
+bg_title = (base_folder + "/resources/assets/backgrounds/landscape.png")
+bg_l1 = (base_folder + "/resources/assets/backgrounds/street.jpg")
+
+setBackgroundImage(bg_title)
 pygame.display.set_caption("Romeo and Juliet")
 
 titleMusic = makeMusic(base_folder+"/resources/assets/sound/music/title.wav")
@@ -32,8 +34,11 @@ slider_hit = False
 
 class level():
     num = 0
-    def generic_function():
-        return num
+    title = ""
+    def scene_title(self):
+        scene_titleLabel = makeLabel(self.title, 80, 100, 100, "white", "gabriola", "clear")
+
+        return scene_titleLabel
 
 def button_clicked(the_label, text, width, height, mouse, click, is_slider = False):
     if not is_slider:
@@ -43,7 +48,6 @@ def button_clicked(the_label, text, width, height, mouse, click, is_slider = Fal
                 moveLabel(the_label, (the_label.rect.topleft[0] + 20), the_label.rect.topleft[1])
 
             if click[0] == 1:
-                print("Click Received! \n")
                 return True
         else:
             the_label.update(text, "black", "white")
@@ -171,25 +175,34 @@ def intro():
     hideLabel(selectMontague), hideLabel(selectCapulet), hideLabel(titleLabel), hideLabel(titleLabel_two)
     return chosenRole
 
-chosen_role = intro()
-
-#Fade out
 fade = pygame.Surface((1000,700))
-def fade_out():
+def fade_out(img):
+    volume_value = get_vol_pref()
+    while float(volume_value) > 0:
+        volume_value = float(volume_value) - 0.5
+        pygame.mixer.music.set_volume(float(volume_value))
+
     for alpha in range(0, 50):
         fade.set_alpha(alpha)
-        fade.fill((0, 0, 0))
+        #fade.fill((0, 0, 0))
         screen.blit(fade, (0,0))
         pygame.display.update()
-        pygame.time.delay(1)
 
-fade_out()
-stopMusic()
+    fade.set_alpha(None)
+    screen.blit(fade, (0,0))
+    pygame.display.update()
 
-#Fancy loading screen here?
+    setBackgroundImage(img)
+
+
+#there is a pause function, look into it?
 
 def prologue():
-    setBackgroundImage(bg_image)
+    prologueMusic = makeMusic(base_folder+"/resources/assets/sound/music/prologue.mp3")
+    playMusic(-1)
+    pygame.mixer.music.set_volume(float(get_vol_pref()))
+
+    #setBackgroundImage(bg_title)
     the_lines = makeSprite(base_folder+ "/resources/assets/images/prologue_lines.png")
 
     continueLabel_1 = makeLabel(" Continue", 60, 390, 550, "black", "gabriola", "white")
@@ -202,28 +215,57 @@ def prologue():
         click = pygame.mouse.get_pressed()
 
         showSprite(the_lines)
-        if ypos >= -750:
+        if ypos >= -650:
             moveSprite(the_lines, 73, ypos)
-            ypos -= 1.5
+            ypos -= 50#1.5
 
         else:
             pygame.time.delay(1)
             showLabel(continueLabel_1)
             b7 = button_clicked(continueLabel_1, " Continue", 220, 70, mouse, click)
             if b7 == True:
-                print("Yay")
-                #Do button stuff
+
+                show_prologue = False
 
         tick(30)
 
+    hideLabel(continueLabel_1), hideSprite(the_lines), killSprite(the_lines)
+
+def l1_transition():
+    public_fight = level()
+    public_fight.title = "Verona - A public place"
+    l1_title = public_fight.scene_title()
+    is_l1 = True
+
+    while is_l1:
+        showLabel(l1_title)
+        time.sleep(3)
+
+        is_l1 = False
+
+        tick(30)
+
+    hideLabel(l1_title)
+
+def l1():
+    print("OOF")
+
+chosen_role = intro()
+
+fade_out(bg_title)
+stopMusic()
+time.sleep(1)
+
 prologue()
+fade_out(bg_l1)
+stopMusic()
+
+l1_transition()
+fade_out(bg_l1)
+
+l1()
 
 while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
+    updateDisplay()
 
-    pygame.display.update()
-    #Perhaps consider updateDisplay() if bugs arise
 #endWait()
