@@ -248,7 +248,51 @@ def l1_transition():
     hideLabel(l1_title)
 
 def l1():
-    print("OOF")
+    #l1_n = makeLabel("", 40, 50, 50, "white", "gabriola", "clear")
+    l1_1 = makeLabel("*bantering*", 40, 50, 50, "white", "gabriola", "clear")
+    l1_2 = makeLabel("Sampson: I will push Montague's men from the wall, and thrust his maids to the wall.", 40, 50, 50, "white", "gabriola", "clear") #Doesnt fit
+    l1_3 = makeLabel("Gregory: The quarrel is between our masters, and us their men.", 40, 50, 50, "white", "gabriola", "clear")
+    l1_4 = makeLabel("*Abram enters*", 40, 50, 50, "white", "gabriola", "clear")
+    l1_5 = makeLabel("Sampson: My naked weapon is out. Quarrel, I will back thee.", 40, 50, 50, "white", "gabriola", "clear")
+    l1_6 = makeLabel("Abram: Do you bite your thumb at us, sir?", 40, 50, 50, "white", "gabriola", "clear")
+
+    l1_c1_a = makeLabel(" Bite thumb", 60, 150, 300, "black", "gabriola", "white")
+    l1_c1_b = makeLabel(" Don't bite", 60, 400, 300, "black", "gabriola", "white")
+
+    sampson = makeSprite(base_folder + "/resources/assets/sprites/sampson/1.png")
+    sampsonY = 300
+
+    l1_labels = [l1_1, l1_2, l1_3, l1_4, l1_5, l1_6]
+
+    while True:
+
+        showSprite(sampson)
+        if sampsonY > 300:
+            sampsonY -= 100
+        else:
+            sampsonY += 100
+        moveSprite(sampson, 50, sampsonY)
+
+        #need to make this run in the background, or the above run alongside... aaa
+        count = 0
+        for label in l1_labels:
+            showLabel(l1_labels[count])
+            try:
+                hideLabel(l1_labels[count - 1])
+            except:
+                pass
+            count += 1
+            time.sleep(5)
+
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        showLabel(l1_c1_a), showLabel(l1_c1_b)
+        b8 = button_clicked(l1_c1_a, " Bite thumb", 220, 70, mouse, click)
+        b9 = button_clicked(l1_c1_b, " Don't bite", 220, 70, mouse, click)
+
+
+        tick(30)
 
 chosen_role = intro()
 
