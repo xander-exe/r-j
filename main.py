@@ -2,14 +2,19 @@ from pygame_functions import *
 import pygame
 import os
 import time
+import random
 
 base_folder = os.path.dirname(os.path.abspath(__file__))
 
 def get_vol_pref():
-    with open(base_folder+ "/resources/preferences/volume.txt", "r") as vol_pref:
-        data = vol_pref.read()
-        vol_pref.close()
+    try:
+        with open(base_folder+ "/resources/preferences/volume.txt", "r") as vol_pref:
+            data = vol_pref.read()
+            vol_pref.close()
 
+            return data
+    except:
+        data = 0.5
         return data
 
 def update_vol_pref(vol):
@@ -250,33 +255,55 @@ def l1_transition():
 def l1():
     #l1_n = makeLabel("", 40, 50, 50, "white", "gabriola", "clear")
     l1_1 = makeLabel("*bantering*", 40, 50, 50, "white", "gabriola", "clear")
-    l1_2 = makeLabel("Sampson: I will push Montague's men from the wall, and thrust his maids to the wall.", 40, 50, 50, "white", "gabriola", "clear") #Doesnt fit
+    l1_2 = makeLabel("Sampson: I will push Montague's men from the wall, and thrust his maids", 40, 50, 50, "white", "gabriola", "clear") #Doesnt fit
+    l1_2_2 = makeLabel("to the wall.", 40, 50, 100, "white", "gabriola", "clear")
     l1_3 = makeLabel("Gregory: The quarrel is between our masters, and us their men.", 40, 50, 50, "white", "gabriola", "clear")
     l1_4 = makeLabel("*Abram enters*", 40, 50, 50, "white", "gabriola", "clear")
     l1_5 = makeLabel("Sampson: My naked weapon is out. Quarrel, I will back thee.", 40, 50, 50, "white", "gabriola", "clear")
     l1_6 = makeLabel("Abram: Do you bite your thumb at us, sir?", 40, 50, 50, "white", "gabriola", "clear")
 
-    l1_c1_a = makeLabel(" Bite thumb", 60, 150, 300, "black", "gabriola", "white")
-    l1_c1_b = makeLabel(" Don't bite", 60, 400, 300, "black", "gabriola", "white")
+    l1_c1_a = makeLabel(" Bite thumb", 60, 230, 200, "black", "gabriola", "white")
+    l1_c1_b = makeLabel(" Don't bite", 60, 550, 200, "black", "gabriola", "white")
 
-    sampson = makeSprite(base_folder + "/resources/assets/sprites/sampson/1.png")
+    health_left = makeSprite(base_folder + "/resources/assets/images/health_bar_left.png")
+    health_right = makeSprite(base_folder + "/resources/assets/images/health_bar_right.png")
+
+    sampson = makeSprite(base_folder + "/resources/assets/sprites/sampson/1.png", 5)
+    gregory = makeSprite(base_folder + "/resources/assets/sprites/gregory/1.png")
+    abram = makeSprite(base_folder + "/resources/assets/sprites/abram/1.png")
+
+    changeSpriteImage(sampson, 2)
+
     sampsonY = 300
+    sampsonX = 100
+    gregoryY = 300
+    gregoryX = 300
+    abramY = 300
+    abramX = 750
 
     l1_labels = [l1_1, l1_2, l1_3, l1_4, l1_5, l1_6]
 
-    while True:
+    #need to make this run in the background, or the above run alongside... aaa
+    if True:
+        showSprite(sampson), showSprite(gregory)
 
-        showSprite(sampson)
-        if sampsonY > 300:
-            sampsonY -= 100
-        else:
-            sampsonY += 100
-        moveSprite(sampson, 50, sampsonY)
+        moveSprite(sampson, sampsonX, sampsonY), moveSprite(gregory, gregoryX, gregoryY)
 
-        #need to make this run in the background, or the above run alongside... aaa
         count = 0
         for label in l1_labels:
-            showLabel(l1_labels[count])
+            if l1_labels[count] == l1_2:
+                showLabel(l1_labels[count])
+                showLabel(l1_2_2)
+            elif l1_labels[count] == l1_3:
+                hideLabel(l1_2_2)
+                showLabel(l1_labels[count])
+            elif l1_labels[count] == l1_4:
+                hideLabel(l1_3)
+                showLabel(l1_4)
+                showSprite(abram)
+                moveSprite(abram, abramX, abramY)
+            else:
+                showLabel(l1_labels[count])
             try:
                 hideLabel(l1_labels[count - 1])
             except:
@@ -284,15 +311,105 @@ def l1():
             count += 1
             time.sleep(5)
 
-        mouse = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed()
+        while True:
 
-        showLabel(l1_c1_a), showLabel(l1_c1_b)
-        b8 = button_clicked(l1_c1_a, " Bite thumb", 220, 70, mouse, click)
-        b9 = button_clicked(l1_c1_b, " Don't bite", 220, 70, mouse, click)
+            if sampsonY > 300:
+                sampsonY -= 10
+            else:
+                sampsonY += 10
+            moveSprite(sampson, sampsonX, sampsonY)
 
+            mouse = pygame.mouse.get_pos()
+            click = pygame.mouse.get_pressed()
 
-        tick(30)
+            showLabel(l1_c1_a), showLabel(l1_c1_b)
+
+            b8 = button_clicked(l1_c1_a, " Bite thumb", 220, 70, mouse, click)
+            b9 = button_clicked(l1_c1_b, " Don't bite", 220, 70, mouse, click)
+
+            if b8 == True or b9 == True:
+                hideLabel(l1_c1_a), hideLabel(l1_c1_b), hideLabel(l1_6)
+                break
+
+            tick(30)
+
+        if b8:
+            print("They fight")
+            prologueMusic = makeMusic(base_folder+"/resources/assets/sound/music/battle.mp3")
+            playMusic(-1)
+            pygame.mixer.music.set_volume(float(get_vol_pref()))
+
+            showSprite(health_left), showSprite(health_right), hideSprite(gregory)
+            moveSprite(health_left, 20, 20),  moveSprite(health_right, 647, 20)
+
+            sampsonHealth = 100
+            abramHealth = 100
+
+            #setBackgroundImage(bg_title)
+            while True:
+
+                drawRect(92, 134, ((sampsonHealth / 5) * 13), 21, "green") #5hp = 13 px
+                drawRect(907, 134, -((abramHealth / 5) * 13) + 2, 21, "green")
+                if keyPressed("right"):
+                    sampsonX += 7
+                    sampsonFacingLeft = False
+                    changeSpriteImage(sampson, 3)
+
+                elif keyPressed("left"):
+                    sampsonX -= 7
+                    sampsonFacingLeft = True
+                    changeSpriteImage(sampson, 1)
+
+                elif keyPressed("space"):
+                    #changeSpriteImage()
+                    if sampsonFacingLeft:
+                        changeSpriteImage(sampson, 0)
+                        if sampsonX <= abramX + 180 and sampsonX > abramX: #the 180 is abram's width + a bit extra
+                            print("Hit")
+                            abramHealth -= 4
+                            abramX -= 50
+                        else:
+                            print("Miss")
+                    else: #If facing right
+                        changeSpriteImage(sampson, 4)
+                        if sampsonX >= abramX - 180 and sampsonX < abramX:
+                            print("Hit")
+                            abramHealth -= 4
+                            abramX += 50
+                        else:
+                            print("Miss")
+
+                elif keyPressed("down"):
+                    sampsonHealth -= 1
+                    abramHealth -= 1
+                elif keyPressed("up"):
+                    sampsonHealth += 1
+                    abramHealth += 1
+
+                abramX += random.randrange(-20, 20)
+
+                if sampsonX > 1010:
+                    sampsonX = -140
+                elif sampsonX < -140: #- Width of character -10
+                    sampsonX = 1010
+
+                if abramX > 1010:
+                    abramX = -140
+                elif abramX < -140:
+                    abramX = 1010
+
+                moveSprite(sampson, sampsonX, sampsonY)
+                moveSprite(abram, abramX, abramY)
+
+                if abramHealth <= 20 or sampsonHealth <= 20:
+                    #Fight scene ends
+                    stopMusic()
+
+                    print("Benvolio Enters")
+                    print("Benvolio: Part Fools!")
+
+        elif b9:
+            print("enter benvolio")
 
 chosen_role = intro()
 
