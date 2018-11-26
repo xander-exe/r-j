@@ -22,6 +22,22 @@ def update_vol_pref(vol):
         vol_pref.write(str(vol))
         vol_pref.close()
 
+def get_difficulty_pref():
+    try:
+        with open(base_folder+ "/resources/preferences/difficulty.txt", "r") as difficulty_pref:
+            data = difficulty_pref.read()
+            difficulty_pref.close()
+
+            return data
+    except:
+        data = 0.1
+        return data
+
+def update_difficulty_pref(difficulty):
+    with open(base_folder+ "/resources/preferences/difficulty.txt", "w") as difficulty_pref:
+        difficulty_pref.write(str(difficulty))
+        difficulty_pref.close()
+
 #Title Screen
 screen = screenSize(1000, 700)
 bg_title = (base_folder + "/resources/assets/backgrounds/landscape.png")
@@ -86,6 +102,9 @@ def intro():
     soundSlider = makeLabel("    ", 50, ((float(get_vol_pref()) * 400) + 100), 280, "black", "gabriola", "white")
     soundLabel = makeLabel(" ", 60, 550, 280, "white", "gabriola", "clear")
 
+    difficultySlider = makeLabel("    ", 50, ((float(get_difficulty_pref()) * 400) + 100), 400, "black", "gabriola", "white")
+    difficultyLabel = makeLabel(" ", 60, 550, 400, "white", "gabriola", "clear")
+
     selectMontague = makeLabel(" Montagues", 60, 240, 320, "black", "gabriola", "white")
     selectCapulet = makeLabel(" Capulets", 60, 540, 320, "black", "gabriola", "white")
 
@@ -123,16 +142,18 @@ def intro():
             click = pygame.mouse.get_pressed()
 
             showLabel(soundSlider), showLabel(soundLabel), showLabel(backLabel)
+            showLabel(difficultySlider)
 
             b4 = button_clicked(backLabel, " Back", 190, 50, mouse, click)
             if b4 == True:
                 is_intro = True
                 is_options = False
-                hideLabel(backLabel), hideLabel(soundLabel), hideLabel(soundSlider)
+                hideLabel(backLabel), hideLabel(soundLabel), hideLabel(soundSlider), hideLabel(difficultySlider), hideLabel(difficultyLabel)
                 titleLabel_two.update("The Game", "white", 0)
                 break
 
             button_clicked(soundSlider, "    ", 36, 51, mouse, click, True)
+            #button_clicked(difficultySlider, "    ", 36, 51, mouse, click, True)
 
             minimum = 100
             maximum = 500
@@ -184,7 +205,7 @@ fade = pygame.Surface((1000,700))
 def fade_out(img):
     volume_value = get_vol_pref()
     while float(volume_value) > 0:
-        volume_value = float(volume_value) - 0.5
+        volume_value = float(volume_value) - 0.25
         pygame.mixer.music.set_volume(float(volume_value))
 
     for alpha in range(0, 50):
@@ -198,7 +219,6 @@ def fade_out(img):
     pygame.display.update()
 
     setBackgroundImage(img)
-
 
 #there is a pause function, look into it?
 
@@ -302,6 +322,11 @@ def scene_1_fight():
             changeSpriteImage(sampson, 1)
 
         elif keyPressed("space"):
+
+            swordSound = makeSound(base_folder + "/resources/assets/sound/sword/" + random.choice(os.listdir(base_folder + "/resources/assets/sound/sword/")))
+            swordSound.set_volume(0.3)
+            playSound(swordSound)
+
             if sampsonFacingLeft:
                 changeSpriteImage(sampson, 0)
                 if sampsonX <= abramX + 180 and sampsonX > abramX: #the 180 is abram's width + a bit extra
@@ -321,7 +346,8 @@ def scene_1_fight():
             sampsonHealth += 1
             abramHealth += 1
 
-        abramX += random.randrange(-20, 20)
+        #abramX += random.randrange(-20, 20)
+        abramX += random.randrange(-100, 100)
 
         if sampsonX > 1010:
             sampsonX = -140
@@ -340,15 +366,23 @@ def scene_1_fight():
         if abramAttack <= 1:
             #changeSpriteImage() to attacking
             if sampsonX <= abramX + 50 and sampsonX > abramX:
+                swordSound = makeSound(base_folder + "/resources/assets/sound/sword/" + random.choice(os.listdir(base_folder + "/resources/assets/sound/sword/")))
+                swordSound.set_volume(0.3)
+                playSound(swordSound)
                 sampsonHealth -= 10
                 sampsonX -= 70
+
             elif sampsonX >= abramX - 50 and sampsonX < abramX:
+                swordSound = makeSound(base_folder + "/resources/assets/sound/sword/" + random.choice(os.listdir(base_folder + "/resources/assets/sound/sword/")))
+                swordSound.set_volume(0.3)
+                playSound(swordSound)
                 sampsonHealth -= 10
                 sampsonX += 70
 
         if abramHealth <= 20 or sampsonHealth <= 20:
             stopMusic()
             smackSound = makeSound(base_folder + "/resources/assets/sound/smack.wav")
+
             playSound(smackSound)
             showSprite(benvolio), moveSprite(benvolio, 500, 300), moveSprite(sampson, 200, 300), moveSprite(abram, 800, 300)
             hideSprite(health_left), hideSprite(health_right)
