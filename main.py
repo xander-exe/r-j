@@ -52,6 +52,7 @@ playMusic(-1)
 pygame.mixer.music.set_volume(float(get_vol_pref()))
 
 slider_hit = False
+slider_hit_diff = False
 
 class level():
     num = 0
@@ -61,7 +62,7 @@ class level():
 
         return scene_titleLabel
 
-def button_clicked(the_label, text, width, height, mouse, click, is_slider = False):
+def button_clicked(the_label, text, width, height, mouse, click, is_slider = False, is_difficulty = False):
     if not is_slider:
         if the_label.rect.topleft[0] + width > mouse[0] > the_label.rect.topleft[0] and the_label.rect.topleft[1] + height > mouse[1] > the_label.rect.topleft[1]:
             the_label.update(text, "black", "orange")
@@ -76,14 +77,24 @@ def button_clicked(the_label, text, width, height, mouse, click, is_slider = Fal
                 moveLabel(the_label, (the_label.rect.topleft[0] - 20), the_label.rect.topleft[1])
 
     else:
-        if the_label.rect.topleft[0] + width > mouse[0] > the_label.rect.topleft[0] and the_label.rect.topleft[1] + height > mouse[1] > the_label.rect.topleft[1]:
-            if click[0] == 1:
-                global slider_hit
-                slider_hit = True
+        if not is_difficulty:
+            if the_label.rect.topleft[0] + width > mouse[0] > the_label.rect.topleft[0] and the_label.rect.topleft[1] + height > mouse[1] > the_label.rect.topleft[1]:
+                if click[0] == 1:
+                    global slider_hit
+                    slider_hit = True
+                else:
+                    slider_hit = False
             else:
-                slider_hit = False
+                the_label.update(text, "black", "white")
         else:
-            the_label.update(text, "black", "white")
+            if the_label.rect.topleft[0] + width > mouse[0] > the_label.rect.topleft[0] and the_label.rect.topleft[1] + height > mouse[1] > the_label.rect.topleft[1]:
+                if click[0] == 1:
+                    global slider_hit_diff
+                    slider_hit_diff = True
+                else:
+                    slider_hit_diff = False
+            else:
+                the_label.update(text, "black", "white")
 
 def intro():
     is_intro = True
@@ -142,7 +153,7 @@ def intro():
             click = pygame.mouse.get_pressed()
 
             showLabel(soundSlider), showLabel(soundLabel), showLabel(backLabel)
-            showLabel(difficultySlider)
+            showLabel(difficultySlider), showLabel(difficultyLabel)
 
             b4 = button_clicked(backLabel, " Back", 190, 50, mouse, click)
             if b4 == True:
@@ -153,7 +164,7 @@ def intro():
                 break
 
             button_clicked(soundSlider, "    ", 36, 51, mouse, click, True)
-            #button_clicked(difficultySlider, "    ", 36, 51, mouse, click, True)
+            button_clicked(difficultySlider, "    ", 36, 51, mouse, click, True, True)
 
             minimum = 100
             maximum = 500
@@ -166,11 +177,18 @@ def intro():
             if slider_hit:
                 moveLabel(soundSlider, new_xpos, 280)
 
+            elif slider_hit_diff:
+                moveLabel(difficultySlider, new_xpos, 400)
+
             volume_value = (soundSlider.rect.topleft[0] - 100) / 400
             pygame.mixer.music.set_volume(volume_value)
             soundLabel.update((str(int(volume_value * 100)) + "% - Volume"), "white", 0)
 
             update_vol_pref(volume_value)
+
+            difficulty_value = (difficultySlider.rect.topleft[0] - 100) / 400
+            difficultyLabel.update((str(int(difficulty_value * 100)) + "% - AI Difficulty"), "white", 0)
+            update_difficulty_pref(difficulty_value)
 
             tick(30)
 
@@ -346,8 +364,12 @@ def scene_1_fight():
             sampsonHealth += 1
             abramHealth += 1
 
+        #0.2 of a % is the interval
+        difficulty = get_difficulty_pref()
         #abramX += random.randrange(-20, 20)
-        abramX += random.randrange(-100, 100)
+        abramX += random.randrange(int(0 - (float(difficulty) * 500)), int((float(difficulty) * 500)))
+        ## TODO:
+        #Have attack frequency be affected by the difficulty
 
         if sampsonX > 1010:
             sampsonX = -140
@@ -362,8 +384,8 @@ def scene_1_fight():
         moveSprite(sampson, sampsonX, sampsonY)
         moveSprite(abram, abramX, abramY)
 
-        abramAttack = random.randrange(0, 15)
-        if abramAttack <= 1:
+        abramAttack = random.randrange(1, 15)
+        if abramAttack <= ((float(difficulty) - 0.05) * 15):
             #changeSpriteImage() to attacking
             if sampsonX <= abramX + 50 and sampsonX > abramX:
                 swordSound = makeSound(base_folder + "/resources/assets/sound/sword/" + random.choice(os.listdir(base_folder + "/resources/assets/sound/sword/")))
