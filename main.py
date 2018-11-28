@@ -412,8 +412,32 @@ def scene_1_fight():
             break
 
 def scene_1_fight_2():
-    s1_f_1 = makeGenText("*Enter Benvolio*")
+    s1_f_2_1 = makeGenText("Tybalt: Peace? I hate the word. As I hate hell, all Montagues,")
+    s1_f_2_1_2 = makeLabel("and thee.", 40, 50, 100, "black", "gabriola", "clear")
+    s1_f_2_2 = makeGenText("Tybalt: Have at thee, coward!")
 
+    s1_f_2_labels = [s1_f_2_1, s1_f_2_2]
+
+    count = 0
+    for label in s1_f_2_labels:
+        if s1_f_2_labels[count] == s1_f_2_1:
+            showLabel(s1_f_2_1), showLabel(s1_f_2_1_2)
+        else:
+            hideLabel(s1_f_2_1_2)
+            showLabel(s1_f_2_labels[count])
+        try:
+            hideLabel(s1_f_2_labels[count - 1])
+        except:
+            pass
+        count += 1
+        time.sleep(1)
+
+        while not keyPressed("enter"):
+            pass
+
+    hideLabel(s1_f_2_2)
+
+    #They Fight
     tybaltX = 400
     tybaltY = 300
     benvolioX = 600
@@ -596,8 +620,70 @@ def scene_1():
         scene_1_fight()
 
     elif b9:
-        scene_1_fight_2()
-        prince_speech()
+        s1_7 = makeGenText("Sampson: No, sir, I do not bite my thumb at you, sir, but I do bite")
+        s1_7_2 = makeLabel("my thumb, sir.", 40, 50, 100, "black", "gabriola", "clear")
+        s1_8 = makeGenText("*Enter Benvolio*")
+        s1_9 = makeGenText("Benvolio: Part, Fools!")
+        s1_10 = makeGenText("*Enter Tybalt*")
+        s1_11 = makeGenText("Tybalt: Turn thee, Benvolio, look upon thy death.")
+        s1_12 = makeGenText("Benvolio: I do but keep the peace. Put up thy sword,")
+        s1_13 = makeGenText("Benvolio: Or manage it to part these men with me.")
+
+        s1_c2_a = makeLabel(" Keep Peace", 60, 230, 200, "black", "gabriola", "white")
+        s1_c2_b = makeLabel(" Fight     ", 60, 550, 200, "black", "gabriola", "white")
+
+        tybaltX = 300
+        tybaltY = 300
+        benvolioX = 700
+        benvolioY = 300
+
+        s1_labels_2 = [s1_7, s1_8, s1_9, s1_10, s1_11, s1_12, s1_13]
+
+        count = 0
+        for label in s1_labels_2:
+            if s1_labels_2[count] == s1_7:
+                showLabel(s1_7), showLabel(s1_7_2)
+            if s1_labels_2[count] == s1_8:
+                hideLabel(s1_7_2)
+                showLabel(s1_labels_2[count])
+                showSprite(benvolio), moveSprite(benvolio, benvolioX, benvolioY)
+            elif s1_labels_2[count] == s1_10:
+                showLabel(s1_labels_2[count])
+                showSprite(tybalt), moveSprite(tybalt, tybaltX, tybaltY)
+            else:
+                showLabel(s1_labels_2[count])
+            try:
+                hideLabel(s1_labels_2[count - 1])
+            except:
+                pass
+
+            count += 1
+            time.sleep(1)
+
+            while not keyPressed("enter"):
+                pass
+
+        while True:
+            mouse = pygame.mouse.get_pos()
+            click = pygame.mouse.get_pressed()
+
+            showLabel(s1_c2_a), showLabel(s1_c2_b)
+
+            b10 = button_clicked(s1_c2_a, " Keep Peace", 220, 70, mouse, click)
+            b11 = button_clicked(s1_c2_b, " Fight     ", 220, 70, mouse, click)
+
+            if b10 or b11: #If either clicked
+                hideLabel(s1_c2_a), hideLabel(s1_c2_b), hideLabel(s1_13)
+                break
+
+            tick(30)
+
+        if b11:
+            scene_1_fight_2()
+            prince_speech()
+
+        elif b10:
+            print("oof")
 
 chosen_role = intro()
 
