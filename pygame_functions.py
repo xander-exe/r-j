@@ -587,6 +587,9 @@ def makeLabel(text, fontSize, xpos, ypos, fontColour='black', font='Arial', back
     thisText = newLabel(text, fontSize, font, fontColour, xpos, ypos, background)
     return thisText
 
+def makeGenText(text):
+    thisText = newLabel(text, 45, "gabriola", "black", 50, 50, "clear")
+    return thisText
 
 def moveLabel(sprite, x, y):
     sprite.rect.topleft = [x, y]
