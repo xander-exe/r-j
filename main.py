@@ -43,6 +43,7 @@ screen = screenSize(1000, 700)
 bg_title = (base_folder + "/resources/assets/backgrounds/landscape.png")
 bg_options = (base_folder + "/resources/assets/backgrounds/options.png")
 bg_l1 = (base_folder + "/resources/assets/backgrounds/street.jpg")
+bg_end = (base_folder + "/resources/assets/backgrounds/end.png")
 
 setBackgroundImage(bg_title)
 pygame.display.set_caption("Romeo and Juliet")
@@ -261,7 +262,7 @@ def prologue():
         showSprite(the_lines)
         if ypos >= -650:
             moveSprite(the_lines, 73, ypos)
-            ypos -= 50 #1.5
+            ypos -= 1.5
 
         else:
             pygame.time.delay(1)
@@ -292,12 +293,12 @@ def l1_transition():
     hideLabel(l1_title)
 
 #Create Sprites
-sampson = makeSprite(base_folder + "/resources/assets/sprites/sampson.png", 5)
+sampson = makeSprite(base_folder + "/resources/assets/sprites/sampson.png", 2)
 gregory = makeSprite(base_folder + "/resources/assets/sprites/gregory.png")
-abram = makeSprite(base_folder + "/resources/assets/sprites/abram.png")
-benvolio = makeSprite(base_folder + "/resources/assets/sprites/benvolio.png")
+abram = makeSprite(base_folder + "/resources/assets/sprites/abram.png", 2)
+benvolio = makeSprite(base_folder + "/resources/assets/sprites/benvolio.png", 5)
 prince = makeSprite(base_folder + "/resources/assets/sprites/prince.png")
-tybalt = makeSprite(base_folder + "/resources/assets/sprites/tybalt.png")
+tybalt = makeSprite(base_folder + "/resources/assets/sprites/tybalt.png", 5)
 
 health_left = makeSprite(base_folder + "/resources/assets/images/health_bar_left.png")
 health_right = makeSprite(base_folder + "/resources/assets/images/health_bar_right.png")
@@ -305,7 +306,11 @@ health_right = makeSprite(base_folder + "/resources/assets/images/health_bar_rig
 def scene_1_fight():
     s1_f_1 = makeGenText("*Enter Benvolio*")
     s1_f_2 = makeGenText("Benvolio: Part, Fools!")
-
+    s1_f_3 = makeGenText("Benvolio: Put up your swords, you know not what you do.")
+    s1_f_4 = makeGenText("*Enter Tybalt*")
+    s1_f_5 = makeGenText("Tybalt: Turn thee, Benvolio, look upon thy death.")
+    s1_f_6 = makeGenText("Benvolio: I do but keep the peace. Put up thy sword,")
+    s1_f_7 = makeGenText("Benvolio: Or manage it to part these men with me.")
 
     sampsonY = 300
     sampsonX = 100
@@ -314,7 +319,7 @@ def scene_1_fight():
     abramY = 300
     abramX = 750
 
-    print("They fight")
+    #They Fight
     prologueMusic = makeMusic(base_folder+"/resources/assets/sound/music/battle.wav")
     playMusic(-1)
     pygame.mixer.music.set_volume(float(get_vol_pref()))
@@ -335,12 +340,12 @@ def scene_1_fight():
         if keyPressed("right"):
             sampsonX += 7
             sampsonFacingLeft = False
-            changeSpriteImage(sampson, 3)
+            changeSpriteImage(sampson, 1)
 
         elif keyPressed("left"):
             sampsonX -= 7
             sampsonFacingLeft = True
-            changeSpriteImage(sampson, 1)
+            changeSpriteImage(sampson, 0)
 
         elif keyPressed("space"):
 
@@ -355,17 +360,14 @@ def scene_1_fight():
                     abramX -= 50
 
             else: #If facing right
-                changeSpriteImage(sampson, 4)
+                changeSpriteImage(sampson, 1)
                 if sampsonX >= abramX - 180 and sampsonX < abramX:
                     abramHealth -= 4
                     abramX += 50
 
-        #0.2 of a % is the interval
         difficulty = get_difficulty_pref()
-        #abramX += random.randrange(-20, 20)
-        abramX += random.randrange(int(0 - (float(difficulty) * 500)), int((float(difficulty) * 500)))
-        ## TODO:
-        #Have attack frequency be affected by the difficulty
+        abramXchange = random.randrange(int(0 - (float(difficulty) * 500)), int((float(difficulty) * 500)))
+        abramX += abramXchange
 
         if sampsonX > 1010:
             sampsonX = -140
@@ -380,9 +382,13 @@ def scene_1_fight():
         moveSprite(sampson, sampsonX, sampsonY)
         moveSprite(abram, abramX, abramY)
 
+        if abramX + abramXchange > abramX:
+            changeSpriteImage(benvolio, 1)
+        else:
+            changeSpriteImage(benvolio, 0)
+
         abramAttack = random.randrange(1, 15)
         if abramAttack <= ((float(difficulty) - 0.05) * 15):
-            #changeSpriteImage() to attacking
             if sampsonX <= abramX + 50 and sampsonX > abramX:
                 swordSound = makeSound(base_folder + "/resources/assets/sound/sword/" + random.choice(os.listdir(base_folder + "/resources/assets/sound/sword/")))
                 swordSound.set_volume(0.3)
@@ -402,14 +408,35 @@ def scene_1_fight():
             smackSound = makeSound(base_folder + "/resources/assets/sound/smack.wav")
 
             playSound(smackSound)
-            showSprite(benvolio), moveSprite(benvolio, 500, 300), moveSprite(sampson, 200, 300), moveSprite(abram, 800, 300)
+            showSprite(benvolio), moveSprite(benvolio, 500, 250), moveSprite(sampson, 270, 250), moveSprite(abram, 800, 250)
             hideSprite(health_left), hideSprite(health_right)
 
-            showLabel(s1_f_1)
-            time.sleep(2)
-            hideLabel(s1_f_1), showLabel(s1_f_2)
+
+            s1_f_labels = [s1_f_1, s1_f_2, s1_f_3, s1_f_4, s1_f_5, s1_f_6, s1_f_7]
+
+            count = 0
+            for label in s1_f_labels:
+                if s1_f_labels[count] == s1_f_4:
+                    showLabel(s1_f_4)
+                    showSprite(tybalt), moveSprite(tybalt, 10, 250), changeSpriteImage(tybalt, 2)
+                else:
+                    showLabel(s1_f_labels[count])
+                try:
+                    hideLabel(s1_f_labels[count - 1])
+                except:
+                    pass
+
+                count += 1
+                time.sleep(1)
+
+                while not keyPressed("enter"):
+                    pass
 
             break
+
+    hideLabel(s1_f_7)
+    scene_1_fight_2()
+    prince_speech()
 
 def scene_1_fight_2():
     s1_f_2_1 = makeGenText("Tybalt: Peace? I hate the word. As I hate hell, all Montagues,")
@@ -435,19 +462,19 @@ def scene_1_fight_2():
         while not keyPressed("enter"):
             pass
 
-    hideLabel(s1_f_2_2)
+    hideLabel(s1_f_2_2), hideSprite(sampson), hideSprite(abram), hideSprite(gregory)
 
     #They Fight
-    tybaltX = 400
-    tybaltY = 300
+    tybaltX = 50
+    tybaltY = 250
     benvolioX = 600
-    benvolioY = 300
+    benvolioY = 250
 
     prologueMusic = makeMusic(base_folder+"/resources/assets/sound/music/battle.wav")
     playMusic(-1)
     pygame.mixer.music.set_volume(float(get_vol_pref()))
 
-    showSprite(health_left), showSprite(health_right), hideSprite(gregory)
+    showSprite(health_left), showSprite(health_right)
     moveSprite(health_left, 20, 20),  moveSprite(health_right, 647, 20)
 
     benvolioHealth = 100
@@ -461,12 +488,12 @@ def scene_1_fight_2():
         if keyPressed("right"):
             tybaltX += 7
             tybaltFacingLeft = False
-            changeSpriteImage(sampson, 3)
+            changeSpriteImage(tybalt, 3)
 
         elif keyPressed("left"):
             tybaltX -= 7
             tybaltFacingLeft = True
-            changeSpriteImage(sampson, 1)
+            changeSpriteImage(tybalt, 1)
 
         elif keyPressed("space"):
             swordSound = makeSound(base_folder + "/resources/assets/sound/sword/" + random.choice(os.listdir(base_folder + "/resources/assets/sound/sword/")))
@@ -474,19 +501,25 @@ def scene_1_fight_2():
             playSound(swordSound)
 
             if tybaltFacingLeft:
-                changeSpriteImage(sampson, 0)
+                changeSpriteImage(tybalt, 0)
                 if tybaltX <= benvolioX + 180 and tybaltX > benvolioX: #the 180 is abram's width + a bit extra
                     benvolioHealth -= 4
                     benvolioX -= 50
 
             else: #If facing right
-                changeSpriteImage(sampson, 4)
+                changeSpriteImage(tybalt, 4)
                 if tybaltX >= benvolioX - 180 and tybaltX < benvolioX:
                     benvolioHealth -= 4
                     benvolioX += 50
 
         difficulty = get_difficulty_pref()
-        benvolioX += random.randrange(int(0 - (float(difficulty) * 500)), int((float(difficulty) * 500)))
+        benvolioXchange = random.randrange(int(0 - (float(difficulty) * 500)), int((float(difficulty) * 500)))
+        benvolioX += benvolioXchange
+
+        if benvolioX + benvolioXchange > benvolioX:
+            changeSpriteImage(benvolio, 3)
+        else:
+            changeSpriteImage(benvolio, 1)
 
         if tybaltX > 1010:
             tybaltX = -140
@@ -498,12 +531,15 @@ def scene_1_fight_2():
         elif benvolioX < -140:
             benvolioX = 1010
 
-        moveSprite(sampson, tybaltX, tybaltY)
-        moveSprite(abram, benvolioX, benvolioY)
+        moveSprite(tybalt, tybaltX, tybaltY)
+        moveSprite(benvolio, benvolioX, benvolioY)
 
         benvolioAttack = random.randrange(1, 15)
         if benvolioAttack <= ((float(difficulty) - 0.05) * 15):
-            #changeSpriteImage() to attacking
+            if tybaltX < benvolioX:
+                changeSpriteImage(benvolio, 0)
+            else:
+                changeSpriteImage(benvolio, 4)
             if tybaltX <= benvolioX + 50 and tybaltX > benvolioX:
                 swordSound = makeSound(base_folder + "/resources/assets/sound/sword/" + random.choice(os.listdir(base_folder + "/resources/assets/sound/sword/")))
                 swordSound.set_volume(0.3)
@@ -523,18 +559,27 @@ def scene_1_fight_2():
             smackSound = makeSound(base_folder + "/resources/assets/sound/smack.wav")
 
             playSound(smackSound)
-            showSprite(prince), moveSprite(prince, 500, 300), moveSprite(tybalt, 200, 300), moveSprite(benvolio, 800, 300)
+            showSprite(prince), moveSprite(prince, 500, 250), moveSprite(tybalt, 200, 250), moveSprite(benvolio, 800, 250)
             hideSprite(health_left), hideSprite(health_right)
 
             break
 
 def prince_speech():
     ps_1 = makeGenText("*Enter Prince*")
-    ps_2 = makeGenText("Rebellious subjects, enemies to peace. You men, you beasts!")
-    ps_3 = makeGenText("Throw your mistempered weapons to the ground, ")
-    ps_4 = makeGenText("And hear the sentence of your movèd prince.")
+    ps_2 = makeGenText("Prince: Rebellious subjects, enemies to peace. You men, you beasts!")
+    ps_3 = makeGenText("Prince: Throw your mistempered weapons to the ground, ")
+    ps_4 = makeGenText("Prince: And hear the sentence of your movèd prince.")
+    ps_5 = makeGenText("Prince: If you ever disturb our streets again,")
+    ps_6 = makeGenText("Prince: Your lives shall pay the forfeit of the peace.")
+    ps_7 = makeGenText("Prince: For this time all the rest depart away:")
+    ps_8 = makeGenText("Prince: You, Capulet, shall go along with me,")
+    ps_9 = makeGenText("Prince: And, Montague, come you this afternoon.")
+    ps_10 = makeGenText("Prince: Once more, on pain of death, all men depart.")
 
-    ps_labels = [ps_1, ps_2, ps_3, ps_4]
+    ps_c1_a = makeLabel(" Ignore Prince", 60, 230, 200, "black", "gabriola", "white")
+    ps_c1_b = makeLabel(" Obey & Depart", 60, 550, 200, "black", "gabriola", "white")
+
+    ps_labels = [ps_1, ps_2, ps_3, ps_4, ps_5, ps_6, ps_7, ps_8, ps_9, ps_10]
 
     count = 0
     for label in ps_labels:
@@ -550,28 +595,100 @@ def prince_speech():
         while not keyPressed("enter"):
             pass
 
+    while True:
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        showLabel(ps_c1_a), showLabel(ps_c1_b)
+
+        b12 = button_clicked(ps_c1_a, " Ignore Prince", 220, 70, mouse, click)
+        b13 = button_clicked(ps_c1_b, " Obey & Depart", 220, 70, mouse, click)
+
+        if b12 or b13: #If either clicked
+            hideLabel(ps_c1_a), hideLabel(ps_c1_b), hideLabel(ps_10)
+            break
+
+        tick(30)
+
+    if b12:
+        ps_12 = makeGenText("Prince: Thee dare defy me?")
+        ps_13 = makeGenText("Prince: Very well. Prepare to face thy death.")
+
+        showLabel(ps_12)
+        while not keyPressed("enter"):
+            pass
+
+        hideLabel(ps_12)
+        showLabel(ps_13)
+
+        time.sleep(1)
+
+        while not keyPressed("enter"):
+            pass
+
+        hideLabel(ps_13)
+
+        lightningSound = makeSound(base_folder + "/resources/assets/sound/lightning.wav")
+        lightningSound.set_volume(0.6)
+        playSound(lightningSound)
+
+        lightning = makeSprite(base_folder + "/resources/assets/images/lightning.png")
+        ash = makeSprite(base_folder + "/resources/assets/images/ash.png")
+        showSprite(lightning)
+
+        for x in range(25):
+            moveSprite(lightning, int(random.randrange(50, 950)), -30) #test this
+            time.sleep(0.1)
+
+        hideAll()
+
+        showSprite(ash)
+        moveSprite(ash, 500, 640)
+
+        setBackgroundImage(bg_end)
+        ps_end_1 = makeGenText("*End Scene 1*")
+        ps_end_1_2 = makeLabel("Status: Dead", 40, 50, 100, "black", "gabriola", "clear")
+        ps_end_1_3 = makeLabel("Loyalty: Moderate", 40, 50, 150, "black", "gabriola", "clear")
+
+        showLabel(ps_end_1), showLabel(ps_end_1_2), showLabel(ps_end_1_3)
+
+    elif b13:
+        hideAll()
+        setBackgroundImage(bg_end)
+
+        ps_end_2 = makeGenText("*End Scene 1*")
+        ps_end_2_2 = makeLabel("Status: Alive", 40, 50, 100, "black", "gabriola", "clear")
+        ps_end_2_3 = makeLabel("Loyalty: Moderate", 40, 50, 150, "black", "gabriola", "clear")
+
+        showLabel(ps_end_2), showLabel(ps_end_2_2), showLabel(ps_end_2_3)
+
 def scene_1():
-    s1_1 = makeGenText("*bantering*")
+    s1_1 = makeGenText("*Bantering*")
     s1_2 = makeGenText("Sampson: I will push Montague's men from the wall, and thrust his")
     s1_2_2 = makeLabel("maids to the wall.", 40, 50, 100, "black", "gabriola", "clear")
     s1_3 = makeGenText("Gregory: The quarrel is between our masters, and us their men.")
-    s1_4 = makeGenText("*Abram enters*")
+    s1_a1 = makeGenText("Gregory: Draw thy tool, here comes of the house of Montagues.")
+    s1_4 = makeGenText("*Enter Abram*")
     s1_5 = makeGenText("Sampson: My naked weapon is out. Quarrel, I will back thee.")
+    s1_a2 = makeGenText("Gregory: I will frown as I pass by.")
+    s1_a3 = makeGenText("Sampson: I will bite my thumb at them.")
     s1_6 = makeGenText("Abram: Do you bite your thumb at us, sir?")
+    s1_a4 = makeGenText("Sampson: [Aside] Is the law of our side if I say ay?")
+    s1_a5 = makeGenText("Gregory: [Aside] No.")
 
     s1_c1_a = makeLabel(" Bite thumb", 60, 230, 200, "black", "gabriola", "white")
     s1_c1_b = makeLabel(" Don't bite", 60, 550, 200, "black", "gabriola", "white")
 
-    changeSpriteImage(sampson, 2)
+    changeSpriteImage(sampson, 1)
 
     sampsonY = 300
-    sampsonX = 100
+    sampsonX = 50
     gregoryY = 300
     gregoryX = 300
     abramY = 300
     abramX = 750
 
-    s1_labels = [s1_1, s1_2, s1_3, s1_4, s1_5, s1_6]
+    s1_labels = [s1_1, s1_2, s1_3, s1_a1 ,s1_4, s1_5, s1_a2, s1_a3 ,s1_6, s1_a4, s1_a5]
 
     showSprite(sampson), showSprite(gregory)
     moveSprite(sampson, sampsonX, sampsonY), moveSprite(gregory, gregoryX, gregoryY)
@@ -611,13 +728,27 @@ def scene_1():
         b9 = button_clicked(s1_c1_b, " Don't bite", 220, 70, mouse, click)
 
         if b8 or b9: #If either clicked
-            hideLabel(s1_c1_a), hideLabel(s1_c1_b), hideLabel(s1_6)
+            hideLabel(s1_c1_a), hideLabel(s1_c1_b), hideLabel(s1_a5)
             break
 
         tick(30)
 
     if b8:
+        s1_a6 = makeGenText("Sampson: Indeed I do, sir.")
+        s1_a7 = makeGenText("Abram: Thee wilt suffer! Draw, if you be men.")
+
+        showLabel(s1_a6)
+        while not keyPressed("enter"):
+            pass
+
+        hideLabel(s1_a6)
+        showLabel(s1_a7)
+
+        time.sleep(3)
+        hideLabel(s1_a7)
+
         scene_1_fight()
+
 
     elif b9:
         s1_7 = makeGenText("Sampson: No, sir, I do not bite my thumb at you, sir, but I do bite")
@@ -632,10 +763,10 @@ def scene_1():
         s1_c2_a = makeLabel(" Keep Peace", 60, 230, 200, "black", "gabriola", "white")
         s1_c2_b = makeLabel(" Fight     ", 60, 550, 200, "black", "gabriola", "white")
 
-        tybaltX = 300
-        tybaltY = 300
-        benvolioX = 700
-        benvolioY = 300
+        tybaltX = 190
+        tybaltY = 250
+        benvolioX = 500
+        benvolioY = 250
 
         s1_labels_2 = [s1_7, s1_8, s1_9, s1_10, s1_11, s1_12, s1_13]
 
@@ -646,10 +777,10 @@ def scene_1():
             if s1_labels_2[count] == s1_8:
                 hideLabel(s1_7_2)
                 showLabel(s1_labels_2[count])
-                showSprite(benvolio), moveSprite(benvolio, benvolioX, benvolioY)
+                showSprite(benvolio), moveSprite(benvolio, benvolioX, benvolioY), hideSprite(gregory)
             elif s1_labels_2[count] == s1_10:
                 showLabel(s1_labels_2[count])
-                showSprite(tybalt), moveSprite(tybalt, tybaltX, tybaltY)
+                showSprite(tybalt), moveSprite(tybalt, tybaltX, tybaltY), changeSpriteImage(tybalt, 2)
             else:
                 showLabel(s1_labels_2[count])
             try:
@@ -683,7 +814,49 @@ def scene_1():
             prince_speech()
 
         elif b10:
-            print("oof")
+            s1_14 = makeGenText("Sampson: O calm, dishonourable, vile submission!")
+            s1_15 = makeGenText("Sampson: Villain! You side with our enemy!")
+            s1_16 = makeGenText("Tybalt: For too long has this ancient grudge")
+            s1_17 = makeGenText("Tybalt: Poisoned the quiet of our streets.")
+            s1_18 = makeGenText("Sampson: Coward! *Stabs Tybalt*")
+
+            s1_labels_3 = [s1_14, s1_15, s1_16, s1_17, s1_18]
+
+            count = 0
+            for label in s1_labels_3:
+                if s1_labels_3[count] == s1_18:
+                    hideLabel(s1_17)
+                    showLabel(s1_18)
+                    moveSprite(sampson, tybaltX, tybaltY)
+                    swordSound = makeSound(base_folder + "/resources/assets/sound/sword/" + random.choice(os.listdir(base_folder + "/resources/assets/sound/sword/")))
+                    swordSound.set_volume(0.5)
+                    playSound(swordSound)
+
+                    time.sleep(1)
+                    moveSprite(sampson, sampsonX, sampsonY)
+                    moveSprite(tybalt, tybaltX, (tybaltY + 180))
+                else:
+                    showLabel(s1_labels_3[count])
+                try:
+                    hideLabel(s1_labels_3[count - 1])
+                except:
+                    pass
+
+                count += 1
+                time.sleep(1)
+
+                while not keyPressed("enter"):
+                    pass
+
+            hideLabel(s1_18)
+            hideAll()
+            fade_out(bg_end)
+
+            s1_e_1 = makeGenText("*End Scene 1*")
+            s1_e_2 = makeLabel("Status: Dead", 40, 50, 100, "black", "gabriola", "clear")
+            s1_e_3 = makeLabel("Loyalty: Little", 40, 50, 150, "black", "gabriola", "clear")
+
+            showLabel(s1_e_1), showLabel(s1_e_2), showLabel(s1_e_3)
 
 chosen_role = intro()
 
